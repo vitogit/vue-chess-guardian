@@ -40,9 +40,7 @@
         <div class="container has-text-centered">
           <div class="columns is-vcentered">
             <div class="column is-5">
-              <figure class="image is-4by3">
-                <img src="http://placehold.it/800x600" alt="Description">
-              </figure>
+              <Chessboard></Chessboard>
             </div>
             <div class="column is-6 is-offset-1">
               <h1 class="title is-2">
@@ -65,12 +63,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import Chessboard from './components/Chessboard'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Chessboard
   }
 }
 </script>
