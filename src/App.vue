@@ -40,7 +40,7 @@
         <div class="container has-text-centered">
           <div class="columns is-vcentered">
             <div class="column is-5">
-              <Chessboard></Chessboard>
+              <Chessboard fen="r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19"></Chessboard>
             </div>
             <div class="column is-6 is-offset-1">
               <h1 class="title is-2">

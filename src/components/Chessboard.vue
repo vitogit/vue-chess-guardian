@@ -15,19 +15,19 @@ export default {
       board: null
     }
   },
+  props: ['fen']
+  ,
   methods: {
     toDests() {
       const dests = {};
-      console.log("this.chess________",this.chess)
       this.chess.SQUARES.forEach(s => {
         const ms = this.chess.moves({square: s, verbose: true});
         if (ms.length) dests[s] = ms.map(m => m.to);
       });
-      console.log("dests________",dests)
       return dests;
     },
 
-    toColor(simplyColor) {
+    toColor() {
       return (this.chess.turn() === 'w') ? 'white' : 'black';
     },
     changeTurn() {
@@ -41,45 +41,16 @@ export default {
           }
         });
       };
-    },
-    updateStatus() {
-      // var status = '';
-      // 
-      // var moveColor = 'White';
-      // if (game.turn() === 'b') {
-      //   moveColor = 'Black';
-      // }
-      // 
-      // // checkmate?
-      // if (game.in_checkmate() === true) {
-      //   status = 'Game over, ' + moveColor + ' is in checkmate.';
-      // }
-      // 
-      // // draw?
-      // else if (game.in_draw() === true) {
-      //   status = 'Game over, drawn position';
-      // }
-      // 
-      // // game still on
-      // else {
-      //   status = moveColor + ' to move';
-      // 
-      //   // check?
-      //   if (game.in_check() === true) {
-      //     status += ', ' + moveColor + ' is in check';
-      //   }
-      // }
-      // 
-      // statusEl.html(status);
-      // fenEl.html(game.fen());
-      // pgnEl.html(game.pgn());
     }
   },  
   mounted() {
-    this.chess = new Chess();
+    this.chess = new Chess(this.fen);
+
     this.board  = Chessground(this.$refs.board, {
+      fen: this.chess.fen(),
+      turnColor: this.toColor(),
       movable: {
-        color: 'white',
+        color: this.toColor(),
         free: false,
         dests: this.toDests()
       }
