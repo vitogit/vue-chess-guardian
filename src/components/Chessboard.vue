@@ -18,7 +18,7 @@ export default {
   props: ['fen']
   ,
   methods: {
-    toDests() {
+    possibleMoves() {
       const dests = {};
       this.chess.SQUARES.forEach(s => {
         const ms = this.chess.moves({square: s, verbose: true});
@@ -26,9 +26,34 @@ export default {
       });
       return dests;
     },
+    opponentMoves() {
+      let originalPGN = this.game.pgn()
 
+      let tokens = this.game.fen().split(' ')
+      tokens[1] = tokens[1] === 'w' ? 'b' : 'w'
+      this.game.load(tokens.join(' '))
+
+      let moves = this.game.moves()
+
+      this.game.load_pgn(originalPGN)
+
+      return moves
+    },
     toColor() {
       return (this.chess.turn() === 'w') ? 'white' : 'black';
+    },
+    paintThreats() {
+      let moves = this.chess.moves({verbose: true});
+      let threats = []
+      moves.forEach(function(move) {
+        if (move["captured"]) {
+          threats.push({orig:move.from,dest:move.to, brush:'red'})
+        }
+        if (move["san"].includes("+")) {
+          threats.push({orig:move.from, dest:move.to, brush:'blue'})
+        }
+      });
+      this.board.setShapes(threats)
     },
     changeTurn() {
       return (orig, dest) => {
@@ -37,9 +62,10 @@ export default {
           turnColor: this.toColor(),
           movable: {
             color: this.toColor(),
-            dests: this.toDests()
+            dests: this.possibleMoves()
           }
         });
+        this.paintThreats()
       };
     }
   },  
@@ -52,12 +78,13 @@ export default {
       movable: {
         color: this.toColor(),
         free: false,
-        dests: this.toDests()
+        dests: this.possibleMoves()
       }
     })
     this.board.set({
       movable: { events: { after: this.changeTurn() } }
     });
+    this.paintThreats()
   }
 }
 </script>
