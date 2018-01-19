@@ -1,4 +1,4 @@
-<template>
+game<template>
   <div  class="blue merida">
     <div ref="board" class="cg-board-wrap"></div>
   </div>  
@@ -20,30 +20,31 @@ export default {
   methods: {
     possibleMoves() {
       const dests = {};
-      this.chess.SQUARES.forEach(s => {
-        const ms = this.chess.moves({square: s, verbose: true});
+      this.game.SQUARES.forEach(s => {
+        const ms = this.game.moves({square: s, verbose: true});
         if (ms.length) dests[s] = ms.map(m => m.to);
       });
       return dests;
     },
     opponentMoves() {
       let originalPGN = this.game.pgn()
-
       let tokens = this.game.fen().split(' ')
       tokens[1] = tokens[1] === 'w' ? 'b' : 'w'
-      this.game.load(tokens.join(' '))
-
-      let moves = this.game.moves()
-
-      this.game.load_pgn(originalPGN)
-
-      return moves
+      tokens = tokens.join(' ')
+      let valid = this.game.load(tokens)
+      if (valid){
+        let moves = this.game.moves({verbose: true})
+        this.game.load_pgn(originalPGN)
+        return moves
+      } else {
+        return []
+      }
     },
     toColor() {
-      return (this.chess.turn() === 'w') ? 'white' : 'black';
+      return (this.game.turn() === 'w') ? 'white' : 'black';
     },
     paintThreats() {
-      let moves = this.chess.moves({verbose: true});
+      let moves = this.game.moves({verbose: true});
       let threats = []
       moves.forEach(function(move) {
         if (move["captured"]) {
@@ -57,7 +58,7 @@ export default {
     },
     changeTurn() {
       return (orig, dest) => {
-        this.chess.move({from: orig, to: dest});
+        this.game.move({from: orig, to: dest});
         this.board.set({
           turnColor: this.toColor(),
           movable: {
@@ -65,31 +66,65 @@ export default {
             dests: this.possibleMoves()
           }
         });
-        this.paintThreats()
       };
-    }
-  },  
-  mounted() {
-    this.chess = new Chess(this.fen);
-
-    this.board  = Chessground(this.$refs.board, {
-      fen: this.chess.fen(),
-      turnColor: this.toColor(),
-      movable: {
-        color: this.toColor(),
-        free: false,
-        dests: this.possibleMoves()
+    },
+    countThreats(color) { //TODO refactor this
+      let threats = {}
+      let captures = 0
+      let checks = 0
+      let moves = this.game.moves({verbose: true})
+      if (color != this.toColor()) {
+        moves = this.opponentMoves()
       }
+      
+      if (moves.length == 0) {
+        return null // It´s an invalid position
+      }
+      
+      moves.forEach(function(move) {
+        if (move["captured"]) {
+          captures++;
+        }
+        if (move["san"].includes("+")) {
+          checks++;
+        }
+      });
+
+      threats['legal_'+color] = moves.length;
+      threats['checks_'+color] = checks;
+      threats['threat_'+color] = captures;
+      return threats
+    },
+    loadFen(fen) {
+      this.game = new Chess(fen);
+
+      this.board  = Chessground(this.$refs.board, {
+        fen: fen,
+        turnColor: this.toColor(),
+        movable: {
+          color: this.toColor(),
+          free: false,
+          dests: this.possibleMoves()
+        }
+      })
+      this.board.set({
+        movable: { events: { after: this.changeTurn() } }
+      });
+    }    
+  },
+  mounted() {
+    this.loadFen(this.fen)
+    let color = this.toColor()
+    let threats = this.countThreats(color)
+    this.$eventHub.$emit('game-changed', {color:color, threats: threats})
+  },
+  created() {
+    this.$eventHub.$on('paint-threats', () => {
+      this.paintThreats()
     })
-    this.board.set({
-      movable: { events: { after: this.changeTurn() } }
-    });
-    this.paintThreats()
-  }
+    this.$eventHub.$on('load-fen', (fen) => {
+      this.loadFen(fen)
+    })
+  }  
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

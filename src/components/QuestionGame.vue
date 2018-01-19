@@ -37,8 +37,7 @@ export default {
         {id:'threat_black', text:'How many pieces is black threating?'}
       ]
     }
-  }
-  ,
+  },
   methods: {
     shuffle(a) {
       for (let i = a.length - 1; i > 0; i--) {
@@ -47,8 +46,10 @@ export default {
       }
       return a;
     },
-    randomQuestion() {
-      return this.questionList[Math.floor(Math.random()*this.questionList.length)];
+    randomQuestion(color) {
+      color = color || 'white'
+      let tempQuestions = this.questionList.filter(q => q.id.includes(color));
+      return tempQuestions[Math.floor(Math.random()*tempQuestions.length)];
     },
     randomNumber(x){
       x = x || 10
@@ -58,29 +59,38 @@ export default {
       let answers = [value+this.randomNumber(value), value, this.randomNumber(value)+2 ]
       return this.shuffle(answers)
     },
-    start() {
-      let questionObj = this.randomQuestion()
+    start(game) {
+      let questionObj = this.randomQuestion(game.color)
       this.question = questionObj.text
-      let value = 20
-      this.answers = this.randomAnswers(value)
+      let value = 0
       switch (questionObj.id) {
         case "legal_white":
+          value = game.threats.legal_white
           break;
         case "legal_black":
+          value = game.threats.legal_black
           break;
         case "checks_white":
+          value = game.threats.checks_white
           break;
         case "checks_black":
+          value = game.threats.checks_black
           break;
         case "threat_white":
+          value = game.threats.threat_white
           break;
         case "threat_black":
+          value = game.threats.threat_black
           break;
       }
+      this.answers = this.randomAnswers(value)
     }
   },
-  mounted() {
-    this.start()
+  created() {
+    this.$eventHub.$on('game-changed', game => {
+      console.log("game________",game)
+      this.start(game)
+    })
   }
 }
 </script>

@@ -40,7 +40,7 @@
         <div class="container has-text-centered">
           <div class="columns is-vcentered">
             <div class="column is-5">
-              <Chessboard fen="r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19"></Chessboard>
+              <Chessboard></Chessboard>
             </div>
             <div class="column is-6 is-offset-1">
               <QuestionGame></QuestionGame>
@@ -63,13 +63,31 @@
 <script>
 import Chessboard from './components/Chessboard'
 import QuestionGame from './components/QuestionGame'
-
 export default {
   name: 'App',
   components: {
     Chessboard,
     QuestionGame
+  },
+  data () {
+    return {
+      positions: ["r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19",
+                  "5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8 b - - 1 32"
+                ],
+      positionNumber: 0
+    }
+  },
+  methods: {
+    start() {
+      let fen = this.positions[this.positionNumber]
+      this.$eventHub.$emit('load-fen', fen)
+      this.positionNumber++
+    }
+  },
+  mounted() {
+    this.start();
   }
+  
 }
 </script>
 
