@@ -4,45 +4,25 @@
       <div class="hero-head">
         <nav class="navbar">
           <div class="container">
-            <div class="navbar-brand">
-              <a class="navbar-item" href="../">
-                LOGO
+            <div>
+              <a href="/">
+                <p class="title">Chess Guardian</p>
+                <p class="subtitle">Answer chess positional questions</p>
               </a>
-              <span class="navbar-burger burger" data-target="navbarMenu">
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
             </div>
             <div id="navbarMenu" class="navbar-menu">
-              <div class="navbar-end">
-                <a class="navbar-item is-active">
-                  Home
-                </a>
-                <a class="navbar-item">
-                  Examples
-                </a>
-                <a class="navbar-item">
-                  Features
-                </a>
-                <a class="navbar-item">
-                  Team
-                </a>
-                <a class="navbar-item">
-                  Help
-                </a>
-              </div>
+              <div class="navbar-end"></div>
             </div>
           </div>
         </nav>
       </div>
       <div class="hero-body">
         <div class="container has-text-centered">
-          <div class="columns is-vcentered">
+          <div class="columns">
             <div class="column is-5">
               <Chessboard></Chessboard>
             </div>
-            <div class="column is-6 is-offset-1">
+            <div class="column is-7">
               <QuestionGame></QuestionGame>
             </div>
           </div>
@@ -52,12 +32,15 @@
       <div class="hero-foot">
         <div class="container">
           <div class="has-text-centered">
-            Footer
+            Made by <a href="http://vitomd.com">@vitomd</a> with <a href="https://vuejs.org/">Vue.js</a>
           </div>
         </div>
       </div>
-    </section> 
+    </section>
+    <a href="https://github.com/vitogit/vue-chess-guardian"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>              </div>
   </div>
+
+
 </template>
 
 <script>
@@ -87,12 +70,15 @@ export default {
   mounted() {
     this.start();
   }
-  
+
 }
 </script>
 
 <style>
   #app {
-
+    margin: 1vh;
+  }
+  .hero.is-fullheight {
+      min-height: 95vh;
   }
 </style>
