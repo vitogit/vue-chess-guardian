@@ -47,8 +47,10 @@ export default {
       let moves = this.game.moves({verbose: true});
       let threats = []
       moves.forEach(function(move) {
+        threats.push({orig:move.to, brush:'yellow'})
+
         if (move["captured"]) {
-          threats.push({orig:move.from,dest:move.to, brush:'red'})
+          threats.push({orig:move.from, dest:move.to, brush:'red'})
         }
         if (move["san"].includes("+")) {
           threats.push({orig:move.from, dest:move.to, brush:'blue'})
@@ -68,7 +70,7 @@ export default {
         });
       };
     },
-    countThreats(color) { //TODO refactor this
+    countThreats(color) {
       let threats = {}
       let captures = 0
       let checks = 0
@@ -76,6 +78,7 @@ export default {
       if (color != this.toColor()) {
         moves = this.opponentMoves()
       }
+      console.log("moves",moves)
 
       if (moves.length == 0) {
         return null // It´s an invalid position
@@ -98,7 +101,7 @@ export default {
     loadFen(fen) {
       this.game = new Chess(fen);
 
-      this.board  = Chessground(this.$refs.board, {
+      this.board = Chessground(this.$refs.board, {
         fen: fen,
         turnColor: this.toColor(),
         movable: {

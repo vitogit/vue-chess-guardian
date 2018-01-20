@@ -46,6 +46,8 @@
 <script>
 import Chessboard from './components/Chessboard'
 import QuestionGame from './components/QuestionGame'
+import { shuffle } from './Util.js';
+
 export default {
   name: 'App',
   components: {
@@ -55,22 +57,37 @@ export default {
   data () {
     return {
       positions: ["r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19",
-                  "5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8 b - - 1 32"
+                  "5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8 b - - 1 32",
+                  "r1bq1rk1/5ppp/5b2/p3p3/3p4/1B6/PPP1QPPP/RN1R2K1 w - - 0 14",
+                  "rn2kb1r/p3qppp/2p2n2/1p2p1B1/2B1P3/1QN5/PPP2PPP/R3K2R w KQkq b6 0 10"
                 ],
       positionNumber: 0
     }
   },
   methods: {
-    start() {
+    nextQuestion() {
       let fen = this.positions[this.positionNumber]
       this.$eventHub.$emit('load-fen', fen)
       this.positionNumber++
+    },
+    start(){
+      this.positionNumber = 0
+      this.positions = shuffle(this.positions)
+      this.nextQuestion();
     }
   },
-  mounted() {
-    this.start();
-  }
 
+  mounted(){
+    this.start()
+  },
+  created() {
+    this.$eventHub.$on('next-question', () => {
+      this.nextQuestion()
+    })
+    this.$eventHub.$on('start-again', () => {
+      this.start()
+    })
+  }
 }
 </script>
 
