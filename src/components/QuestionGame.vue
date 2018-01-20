@@ -8,7 +8,7 @@
           </h1>
         </div>
       </div>
-    </section>  
+    </section>
     <section class="hero" ref="answers">
       <div class="buttons is-centered">
         <span class="button" v-for="answer in answers">
@@ -32,7 +32,7 @@ export default {
         {id:'legal_white', text:'How many legal moves white has?'},
         {id:'legal_black', text:'How many legal moves black has?'},
         {id:'checks_white', text:'How many checks moves white has?'},
-        {id:'checks_black', text:'How many checks moves white has?'},
+        {id:'checks_black', text:'How many checks moves black has?'},
         {id:'threat_white', text:'How many pieces is white threating?'},
         {id:'threat_black', text:'How many pieces is black threating?'}
       ]
@@ -51,12 +51,21 @@ export default {
       let tempQuestions = this.questionList.filter(q => q.id.includes(color));
       return tempQuestions[Math.floor(Math.random()*tempQuestions.length)];
     },
-    randomNumber(x){
-      x = x || 10
-      return Math.floor(Math.random() * x) + 1 
+    randomNumber(min, max) {
+      return Math.floor(Math.random()*(max-min+1)+min);
     },
     randomAnswers(value) {
-      let answers = [value+this.randomNumber(value), value, this.randomNumber(value)+2 ]
+      let maxAnswers = 4
+      let answers = []
+      answers[0] = value
+      while (answers.length < maxAnswers) {
+        let randomNumber = this.randomNumber(value-6, value+6)
+        if (randomNumber < 0) {
+          randomNumber = 0
+        }
+        if(answers.indexOf(randomNumber) > -1) continue;
+        answers[answers.length] = randomNumber;
+      }
       return this.shuffle(answers)
     },
     start(game) {

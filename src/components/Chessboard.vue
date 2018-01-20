@@ -1,7 +1,7 @@
 game<template>
   <div  class="blue merida">
     <div ref="board" class="cg-board-wrap"></div>
-  </div>  
+  </div>
 </template>
 
 <script>
@@ -76,11 +76,11 @@ export default {
       if (color != this.toColor()) {
         moves = this.opponentMoves()
       }
-      
+
       if (moves.length == 0) {
         return null // It´s an invalid position
       }
-      
+
       moves.forEach(function(move) {
         if (move["captured"]) {
           captures++;
@@ -110,13 +110,7 @@ export default {
       this.board.set({
         movable: { events: { after: this.changeTurn() } }
       });
-    }    
-  },
-  mounted() {
-    this.loadFen(this.fen)
-    let color = this.toColor()
-    let threats = this.countThreats(color)
-    this.$eventHub.$emit('game-changed', {color:color, threats: threats})
+    }
   },
   created() {
     this.$eventHub.$on('paint-threats', () => {
@@ -124,7 +118,10 @@ export default {
     })
     this.$eventHub.$on('load-fen', (fen) => {
       this.loadFen(fen)
+      let color = this.toColor()
+      let threats = this.countThreats(color)
+      this.$eventHub.$emit('game-changed', {color:color, threats: threats})
     })
-  }  
+  }
 }
 </script>

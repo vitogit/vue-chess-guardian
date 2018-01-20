@@ -79,6 +79,6 @@ export default {
     margin: 1vh;
   }
   .hero.is-fullheight {
-      min-height: 95vh;
+    min-height: 95vh;
   }
 </style>
