@@ -64,7 +64,7 @@ export default {
       showingResult: false,
       status: null,
       corrects: 0,
-      maxQuestions: 3,
+      maxQuestions: 10,
       questionList: [
         {id:'legal_white', text:'How many legal moves white has?'},
         {id:'legal_black', text:'How many legal moves black has?'},

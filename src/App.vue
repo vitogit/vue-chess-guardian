@@ -40,7 +40,6 @@
     <a href="https://github.com/vitogit/vue-chess-guardian"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>              </div>
   </div>
 
-
 </template>
 
 <script>
@@ -66,36 +65,28 @@ export default {
   methods: {
     nextQuestion() {
       let position = this.positions[this.positionNumber]
-      console.log("position.fen",position.fen)
-      this.$eventHub.$emit('load-fen', position.fen)
+      this.$eventHub.$emit('load-position', position)
       this.positionNumber++
     },
-    start(username){
-      let loading = this.$loading.open()
+    start(username){ //TODO improve this method
       let positions = []
-      console.log("username",username)
       if (username) {
         this.positions = this.getPositions(username)
       } else {
         this.positions = defaultPositions()
       }
-      console.log("this.positions.length",this.positions.length)
       if (this.positions.length < 10 ) {
-        console.log("no games found or not enough games, choose another username or date")
         this.promptAgain()
-        loading.close()
-
       } else {
         this.positionNumber = 0
         this.positions = shuffle(this.positions)
-        this.nextQuestion();
-        loading.close()
+        this.nextQuestion()
       }
-
     },
     getPositions(username){ //TODO refactor this big method and make it async
+      let isLoading = this.$loading.open() //TODO fix. this is not working
+
       username = username || 'hikaru'
-      console.log("username",username)
       this.$toast.open(`Pulling positions from: ${username}`)
       let games = []
       jQuery.ajax({
@@ -103,10 +94,10 @@ export default {
           url: 'https://api.chess.com/pub/player/'+username+'/games/2017/12',
           async: false,
           success: function (data) {
-              games = data.games.slice(0,50) //get 50 games
+            games = data.games.slice(0,50) //get 50 games
           },
           error: function (error) {
-              console.log('Something wrong with ajax:', error);
+            console.log('Something wrong with ajax:', error);
           }
       });
       let positions = []
@@ -120,8 +111,9 @@ export default {
         Array.from(Array(middlegame), () => loadedGame.undo()) //go back to middlegame
         let p = {fen: loadedGame.fen(), white: game.white.username, black: game.black.username, url: game.url}
         positions.push(p)
-        document.write(JSON.stringify(p)+',')
       })
+      isLoading.close()
+
       return positions
     },
     promptAgain() { //TODO DRY prompts
@@ -129,7 +121,7 @@ export default {
           title: `ERROR`,
           message: `There are not enough games from the selected user. Select another chess.com user.`,
           inputAttrs: {
-              placeholder: 'e.g. hikaru, LyonBeast',
+              placeholder: 'e.g. hikaru',
               maxlength: 20
           },
           type: 'is-danger',
@@ -143,7 +135,7 @@ export default {
           title: `What's your chess.com username?`,
           message: `It will pull random positions from the games of the selected chess.com user from December of 2017.`,
           inputAttrs: {
-              placeholder: 'e.g. hikaru, LyonBeast',
+              placeholder: 'e.g. hikaru',
               maxlength: 20
           },
           cancelText: 'Default positions',

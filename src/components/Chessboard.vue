@@ -1,7 +1,7 @@
 <template>
   <div  class="blue merida">
-    <div ref="board" class="cg-board-wrap"></div>
-    <div>NN VS NN <br><a href="chess.com">View game in chess.com</a></div>
+    <div ref="board" class="cg-board-wrap"></div> </br>
+    <div>{{position.white}} VS {{position.black}} <br><a :href="position.url">View game in chess.com</a></div>
   </div>
 </template>
 
@@ -15,7 +15,8 @@ export default {
   data () {
     return {
       game: null,
-      board: null
+      board: null,
+      position: {}
     }
   },
   props: ['fen']
@@ -81,7 +82,6 @@ export default {
       if (color != this.toColor()) {
         moves = this.opponentMoves()
       }
-      console.log("moves",moves)
 
       if (moves.length == 0) {
         return null // It´s an invalid position
@@ -122,8 +122,9 @@ export default {
     this.$eventHub.$on('paint-threats', () => {
       this.paintThreats()
     })
-    this.$eventHub.$on('load-fen', (fen) => {
-      this.loadFen(fen)
+    this.$eventHub.$on('load-position', (position) => {
+      this.position = position
+      this.loadFen(position.fen)
       let color = this.toColor()
       let threats = this.countThreats(color)
       this.$eventHub.$emit('game-changed', {color:color, threats: threats})
