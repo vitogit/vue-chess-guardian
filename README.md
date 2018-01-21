@@ -1,6 +1,10 @@
 # vue-chess-guardian
 
-> Chess training exercices in Vue.js
+## Answer Chess positional questions from your own games
+> Made in [Vue.js](http://vuejs.org)
+> It uses [chess.js](https://github.com/jhlywa/chess.js) for chess movements and validations
+> It uses chessground for chessboard UI  [chessground](https://github.com/ornicar/chessground)
+> It uses chess.com API to get positions from your games or specific users
 
 ## Build Setup
 
@@ -11,17 +15,4 @@ npm install
 # serve with hot reload at localhost:8080
 npm run dev
 
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

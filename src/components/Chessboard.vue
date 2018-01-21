@@ -1,12 +1,15 @@
-game<template>
+<template>
   <div  class="blue merida">
     <div ref="board" class="cg-board-wrap"></div>
+    <div>NN VS NN <br><a href="chess.com">View game in chess.com</a></div>
   </div>
 </template>
 
 <script>
 import Chess from 'chess.js'
 import { Chessground }  from 'chessground';
+import { uniques } from '../Util.js';
+
 export default {
   name: 'Chessboard',
   data () {
@@ -93,7 +96,7 @@ export default {
         }
       });
 
-      threats['legal_'+color] = moves.length;
+      threats['legal_'+color] = uniques(moves.map(x => x.from+x.to)).length //promotions count as 4 moves. This remove those duplicates moves.
       threats['checks_'+color] = checks;
       threats['threat_'+color] = captures;
       return threats
@@ -128,3 +131,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .blue .cg-board-wrap {
+    margin: 0 auto;
+  }
+</style>
