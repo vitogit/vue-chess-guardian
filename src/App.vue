@@ -49,6 +49,7 @@ import QuestionGame from './components/QuestionGame'
 import { shuffle } from './Util.js'
 import jQuery from 'jquery'
 import Chess from 'chess.js'
+import {defaultPositions} from './PositionData.js'
 
 export default {
   name: 'App',
@@ -58,18 +59,7 @@ export default {
   },
   data () {
     return {
-      positions: [
-        // {fen:'r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19', white:'nn', black:'nn', url:'https://www.chess.com/daily/game/29076790'},
-        // {fen:'5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8 b - - 1 32', white:'nn', black:'nn', url:'https://www.chess.com/daily/game/29076790'},
-        // {fen:'r1bq1rk1/5ppp/5b2/p3p3/3p4/1B6/PPP1QPPP/RN1R2K1 w - - 0 14', white:'nn', black:'nn', url:'https://www.chess.com/daily/game/29076790'},
-        // {fen:'rn2kb1r/p3qppp/2p2n2/1p2p1B1/2B1P3/1QN5/PPP2PPP/R3K2R w KQkq b6 0 10', white:'nn', black:'nn', url:'https://www.chess.com/daily/game/29076790'}
-
-      ],
-      // positions: ["r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19",
-      //             "5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8 b - - 1 32",
-      //             "r1bq1rk1/5ppp/5b2/p3p3/3p4/1B6/PPP1QPPP/RN1R2K1 w - - 0 14",
-      //             "rn2kb1r/p3qppp/2p2n2/1p2p1B1/2B1P3/1QN5/PPP2PPP/R3K2R w KQkq b6 0 10"
-      //           ],
+      positions: [],
       positionNumber: 0
     }
   },
@@ -82,18 +72,26 @@ export default {
     },
     start(username){
       let loading = this.$loading.open()
-
-      this.positions = this.getPositions(username)
+      let positions = []
+      console.log("username",username)
+      if (username) {
+        this.positions = this.getPositions(username)
+      } else {
+        this.positions = defaultPositions()
+      }
+      console.log("this.positions.length",this.positions.length)
       if (this.positions.length < 10 ) {
         console.log("no games found or not enough games, choose another username or date")
         this.promptAgain()
+        loading.close()
+
       } else {
         this.positionNumber = 0
         this.positions = shuffle(this.positions)
         this.nextQuestion();
+        loading.close()
       }
 
-      loading.close()
     },
     getPositions(username){ //TODO refactor this big method and make it async
       username = username || 'hikaru'
@@ -115,21 +113,23 @@ export default {
       let loadedGame = new Chess()
       games.forEach(game => {
         loadedGame.load_pgn(game.pgn)
+        let middlegame = Math.round(loadedGame.history().length / 2)
         if (loadedGame.history().length < 40) {
           return // skip this and go to next game if is too short (40 halfmoves)
         }
-        Array.from(Array(30), () => loadedGame.undo()) //go back 30 halfmoves
+        Array.from(Array(middlegame), () => loadedGame.undo()) //go back to middlegame
         let p = {fen: loadedGame.fen(), white: game.white.username, black: game.black.username, url: game.url}
         positions.push(p)
+        document.write(JSON.stringify(p)+',')
       })
       return positions
     },
     promptAgain() { //TODO DRY prompts
       this.$dialog.prompt({
-          title: `What's your chess.com username?`,
-          message: `There are not enough games from the selected user. Select another.`,
+          title: `ERROR`,
+          message: `There are not enough games from the selected user. Select another chess.com user.`,
           inputAttrs: {
-              placeholder: 'e.g. MagnusCarlsen, hikaru',
+              placeholder: 'e.g. hikaru, LyonBeast',
               maxlength: 20
           },
           type: 'is-danger',
@@ -143,7 +143,7 @@ export default {
           title: `What's your chess.com username?`,
           message: `It will pull random positions from the games of the selected chess.com user from December of 2017.`,
           inputAttrs: {
-              placeholder: 'e.g. MagnusCarlsen, hikaru',
+              placeholder: 'e.g. hikaru, LyonBeast',
               maxlength: 20
           },
           cancelText: 'Default positions',
