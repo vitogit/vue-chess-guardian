@@ -1,7 +1,7 @@
 <template>
   <div  class="blue merida">
     <div ref="board" class="cg-board-wrap"></div> </br>
-    <div>{{position.white}} VS {{position.black}} <br><a :href="position.url">View game in chess.com</a></div>
+    <div>{{white}} VS {{black}} <br><a :href="url">View game in chess.com</a></div>
   </div>
 </template>
 
@@ -16,7 +16,9 @@ export default {
     return {
       game: null,
       board: null,
-      position: {}
+      white: '',
+      black: '',
+      url: ''
     }
   },
   props: ['fen']
@@ -123,7 +125,9 @@ export default {
       this.paintThreats()
     })
     this.$eventHub.$on('load-position', (position) => {
-      this.position = position
+      this.white = position.white
+      this.black = position.black
+      this.url = position.url
       this.loadFen(position.fen)
       let color = this.toColor()
       let threats = this.countThreats(color)

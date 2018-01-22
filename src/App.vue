@@ -59,7 +59,8 @@ export default {
   data () {
     return {
       positions: [],
-      positionNumber: 0
+      positionNumber: 0,
+      started: false
     }
   },
   methods: {
@@ -69,6 +70,10 @@ export default {
       this.positionNumber++
     },
     start(username){ //TODO improve this method
+      if (this.started)
+        return
+      
+      this.started = true
       let positions = []
       if (username) {
         this.positions = this.getPositions(username)
@@ -84,9 +89,10 @@ export default {
       }
     },
     getPositions(username){ //TODO refactor this big method and make it async
-      let isLoading = this.$loading.open() //TODO fix. this is not working
-
+      // let isLoading = this.$loading.open() //TODO fix. this is not working
       username = username || 'hikaru'
+      username = username.replace(/\s/g, '').toLowerCase()
+
       this.$toast.open(`Pulling positions from: ${username}`)
       let games = []
       jQuery.ajax({
@@ -112,7 +118,8 @@ export default {
         let p = {fen: loadedGame.fen(), white: game.white.username, black: game.black.username, url: game.url}
         positions.push(p)
       })
-      isLoading.close()
+      console.log("positions.length________",positions.length)
+      // isLoading.close()
 
       return positions
     },
@@ -140,7 +147,7 @@ export default {
           },
           cancelText: 'Default positions',
           onConfirm: (value) => this.start(value),
-          onCancel: () => this.start()
+          onCancel: () => this.start() // TODO for some reason this is executed when promp is closed. using started=false to bypass
       })
     }
   },
@@ -153,7 +160,10 @@ export default {
       this.nextQuestion()
     })
     this.$eventHub.$on('start-again', () => {
-      this.start()
+      this.started = false
+      this.positionNumber = 0
+      this.positions = shuffle(this.positions)
+      this.nextQuestion()
     })
   }
 }
