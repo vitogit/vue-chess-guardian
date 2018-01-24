@@ -72,10 +72,10 @@ export default {
       this.$eventHub.$emit('load-position', position)
       this.positionNumber++
     },
-    start(username){ //TODO improve this method
+    start(data){ //TODO improve this method
       let positions = []
-      if (username) {
-        this.positions = this.getPositions(username)
+      if (data.username) {
+        this.positions = this.getPositions(data)
       } else {
         this.positions = defaultPositions()
       }
@@ -87,7 +87,10 @@ export default {
         this.nextQuestion()
       }
     },
-    getPositions(username){ //TODO refactor this big method and make it async
+    getPositions({username, year, month}){ //TODO refactor this big method and make it async
+
+      month = ("00" + month).slice(-2) // API expect month like 2 digits MM
+
       // let isLoading = this.$loading.open() //TODO fix. this is not working
       username = username || 'hikaru'
       username = username.replace(/\s/g, '').toLowerCase()
@@ -96,7 +99,7 @@ export default {
       let games = []
       jQuery.ajax({
           method: 'GET',
-          url: 'https://api.chess.com/pub/player/'+username+'/games/2017/12',
+          url: `https://api.chess.com/pub/player/${username}/games/${year}/${month}`,
           async: false,
           success: function (data) {
             games = data.games.slice(0,50) //get 50 games
@@ -125,14 +128,14 @@ export default {
     promptAgain() {
       this.genericPrompt({
         title: 'ERROR',
-        message: 'There are not enough games from the selected user. Select another chess.com user.',
+        message: `There are not enough games (${this.positions.length}) from the selected user and month. You need at least 10. Select another chess.com user or month.`,
         type:'is-danger'
       })
     },
     prompt() {
       this.genericPrompt({
         title: `What's your chess.com username?`,
-        message: 'It will pull random positions from the games of the selected chess.com user from December of 2017.'
+        message: 'It will pull random positions from the games played in the selected month for the selected user '
       }) 
     }, 
     genericPrompt({title, message, type}) {
@@ -148,7 +151,7 @@ export default {
             maxlength: 20
           },
           type: type,
-          onConfirm: (value) => this.start(value),
+          onConfirm: (data) => this.start(data),
           onCancel: () => this.start()
         }
       })
