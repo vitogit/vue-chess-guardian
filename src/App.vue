@@ -49,18 +49,21 @@ import { shuffle } from './Util.js'
 import jQuery from 'jquery'
 import Chess from 'chess.js'
 import {defaultPositions} from './PositionData.js'
+import StartModal from './components/StartModal'
 
 export default {
   name: 'App',
   components: {
     Chessboard,
-    QuestionGame
+    QuestionGame,
+    StartModal
   },
   data () {
     return {
       positions: [],
       positionNumber: 0,
-      started: false
+      started: false,
+      isStartModalActive: true
     }
   },
   methods: {
@@ -70,10 +73,6 @@ export default {
       this.positionNumber++
     },
     start(username){ //TODO improve this method
-      if (this.started)
-        return
-      
-      this.started = true
       let positions = []
       if (username) {
         this.positions = this.getPositions(username)
@@ -123,35 +122,38 @@ export default {
 
       return positions
     },
-    promptAgain() { //TODO DRY prompts
-      this.$dialog.prompt({
-          title: `ERROR`,
-          message: `There are not enough games from the selected user. Select another chess.com user.`,
-          inputAttrs: {
-              placeholder: 'e.g. hikaru',
-              maxlength: 20
-          },
-          type: 'is-danger',
-          cancelText: 'Default positions',
-          onConfirm: (value) => this.start(value),
-          onCancel: () => this.start()
+    promptAgain() {
+      this.genericPrompt({
+        title: 'ERROR',
+        message: 'There are not enough games from the selected user. Select another chess.com user.',
+        type:'is-danger'
       })
     },
     prompt() {
-      this.$dialog.prompt({
-          title: `What's your chess.com username?`,
-          message: `It will pull random positions from the games of the selected chess.com user from December of 2017.`,
+      this.genericPrompt({
+        title: `What's your chess.com username?`,
+        message: 'It will pull random positions from the games of the selected chess.com user from December of 2017.'
+      }) 
+    }, 
+    genericPrompt({title, message, type}) {
+      this.$modal.open({
+        parent: this,
+        component: StartModal,
+        hasModalCard: true,
+        props: {
+          title: title,
+          message: message,
           inputAttrs: {
-              placeholder: 'e.g. hikaru',
-              maxlength: 20
+            placeholder: 'e.g. hikaru',
+            maxlength: 20
           },
-          cancelText: 'Default positions',
+          type: type,
           onConfirm: (value) => this.start(value),
-          onCancel: () => this.start() // TODO for some reason this is executed when promp is closed. using started=false to bypass
+          onCancel: () => this.start()
+        }
       })
     }
   },
-
   mounted(){
     this.prompt()
   },
@@ -160,7 +162,6 @@ export default {
       this.nextQuestion()
     })
     this.$eventHub.$on('start-again', () => {
-      this.started = false
       this.positionNumber = 0
       this.positions = shuffle(this.positions)
       this.nextQuestion()
