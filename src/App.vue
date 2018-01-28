@@ -74,7 +74,7 @@ export default {
     },
     start(data){ //TODO improve this method
       let positions = []
-      if (data.username) {
+      if (data && data.username) {
         this.positions = this.getPositions(data)
       } else {
         this.positions = defaultPositions()
@@ -136,8 +136,8 @@ export default {
       this.genericPrompt({
         title: `What's your chess.com username?`,
         message: 'It will pull random positions from the games played in the selected month for the selected user '
-      }) 
-    }, 
+      })
+    },
     genericPrompt({title, message, type}) {
       this.$modal.open({
         parent: this,
