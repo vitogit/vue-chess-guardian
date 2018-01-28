@@ -20,7 +20,10 @@
         <div class="container has-text-centered">
           <div class="columns">
             <div class="column is-5">
-              <Chessboard></Chessboard>
+              <chessboard :fen="currentPosition.fen" :showThreats="showThreats" @onMove="showInfo"></chessboard>
+              <div class="has-centered-text">
+                {{currentPosition.white}} VS {{currentPosition.black}} <br><a :href="currentPosition.url">View game in chess.com</a>
+              </div>
             </div>
             <div class="column is-7">
               <QuestionGame></QuestionGame>
@@ -43,33 +46,36 @@
 </template>
 
 <script>
-import Chessboard from './components/Chessboard'
-import QuestionGame from './components/QuestionGame'
-import { shuffle } from './Util.js'
 import jQuery from 'jquery'
 import Chess from 'chess.js'
+import {chessboard} from 'vue-chessboard'
+import 'vue-chessboard/dist/vue-chessboard.css'
+import { shuffle } from './Util.js'
 import {defaultPositions} from './PositionData.js'
+import QuestionGame from './components/QuestionGame'
 import StartModal from './components/StartModal'
 
 export default {
   name: 'App',
   components: {
-    Chessboard,
+    chessboard,
     QuestionGame,
     StartModal
   },
   data () {
     return {
-      positions: [],
+      currentPosition: {},
+      showThreats: false,
       positionNumber: 0,
       started: false,
-      isStartModalActive: true
+      isStartModalActive: true,
+      positionInfo: {},
     }
   },
   methods: {
     nextQuestion() {
       let position = this.positions[this.positionNumber]
-      this.$eventHub.$emit('load-position', position)
+      this.currentPosition = position
       this.positionNumber++
     },
     start(data){ //TODO improve this method
@@ -98,15 +104,15 @@ export default {
       this.$toast.open(`Pulling positions from: ${username}`)
       let games = []
       jQuery.ajax({
-          method: 'GET',
-          url: `https://api.chess.com/pub/player/${username}/games/${year}/${month}`,
-          async: false,
-          success: function (data) {
-            games = data.games.slice(0,50) //get 50 games
-          },
-          error: function (error) {
-            console.log('Something wrong with ajax:', error);
-          }
+        method: 'GET',
+        url: `https://api.chess.com/pub/player/${username}/games/${year}/${month}`,
+        async: false,
+        success: function (data) {
+          games = data.games.slice(0,50) //get 50 games
+        },
+        error: function (error) {
+          console.log('Something wrong with ajax:', error);
+        }
       });
       let positions = []
       let loadedGame = new Chess()
@@ -155,16 +161,27 @@ export default {
           onCancel: () => this.start()
         }
       })
+    },
+    showInfo(info){
+      this.positionInfo = info
+      this.$eventHub.$emit('game-changed', {color:this.positionInfo.turn, threats: this.positionInfo})
     }
   },
   mounted(){
     this.prompt()
   },
   created() {
+    this.positions = []
+    this.$eventHub.$on('paint-threats', () => {
+      this.showThreats = true
+    })
+
     this.$eventHub.$on('next-question', () => {
+      this.showThreats = false
       this.nextQuestion()
     })
     this.$eventHub.$on('start-again', () => {
+      this.showThreats = false
       this.positionNumber = 0
       this.positions = shuffle(this.positions)
       this.nextQuestion()
@@ -179,5 +196,8 @@ export default {
   }
   .hero.is-fullheight {
     min-height: 95vh;
+  }
+  .cg-board-wrap {
+    margin: 0 auto;
   }
 </style>
