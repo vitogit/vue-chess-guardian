@@ -1,6 +1,9 @@
 # Chess Guardian
 
-## Answer Chess positional questions from your own games
+## Answer Chess technical questions from your own positions to improve board vision.
+
+Inspired by this article [https://www.chess.com/blog/danheisman/the-amazing-power-of-board-vision](The Amazing Power of Board Vision) by Dan Heisman
+
 - Made in [Vue.js](http://vuejs.org) with [Buefy](https://buefy.github.io) for style
 - It uses [vue-chessboard](https://github.com/vitogit/vue-chessboard) to show the chessboard and the threats
   - It uses [chess.js](https://github.com/jhlywa/chess.js) for chess movements and validations

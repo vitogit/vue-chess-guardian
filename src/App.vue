@@ -7,8 +7,10 @@
             <div>
               <a href="/">
                 <p class="title">Chess Guardian (beta)</p>
-                <p class="subtitle">Answer chess positional questions from your own games.</p>
+                <p class="subtitle">Answer Chess technical questions from your own positions to improve board vision.</p>
               </a>
+              <p class="subtitle">Inspired by this article <a href="https://www.chess.com/blog/danheisman/the-amazing-power-of-board-vision">The Amazing Power of Board Vision</a> by Dan Heisman</p>
+
             </div>
             <div id="navbarMenu" class="navbar-menu">
               <div class="navbar-end"></div>
