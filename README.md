@@ -16,6 +16,11 @@ Inspired by this article [The Amazing Power of Board Vision](https://www.chess.c
 
 [http://vitomd.com/vue-chess-guardian/](http://vitomd.com/vue-chess-guardian/)
 
+## Want to see all my chess related projects? 
+
+Check [My projects](http://vitomd.com/blog/projects/) for a full detailed list.
+
+
 ## Build Setup
 
 ``` bash
